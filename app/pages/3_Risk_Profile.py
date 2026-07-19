@@ -38,7 +38,7 @@ preview = compute_risk(answers, customer.age, customer.annual_income, customer.d
 gauge_col, summary_col = st.columns([2, 3])
 with gauge_col:
     st.plotly_chart(risk_gauge(preview.risk_score, preview.risk_band),
-                    use_container_width=True)
+                    width="stretch")
 with summary_col:
     st.markdown(
         f"""
@@ -94,7 +94,7 @@ with st.container(border=True):
             f"Explain why **{customer.name}** landed in the **{preview.risk_band}** band. "
             "The score is deterministic — this only adds context."
         )
-        if st.button("Explain this band", use_container_width=True,
+        if st.button("Explain this band", width="stretch",
                         key="explain_band_btn"):
             with st.spinner("Grounded explanation from the narrator..."):
                 _rationale = narrate_risk(customer, preview, answers)
@@ -163,7 +163,7 @@ else:
     st.info("This journey doesn't require goal inputs — use the FinAdvisor chat instead.")
 
 col_l, col_r = st.columns(2)
-if col_l.button("Save profile", use_container_width=True):
+if col_l.button("Save profile", width="stretch"):
     customer.risk_answers = answers
     customer.goal_inputs = goal_inputs
     upsert_customer(customer)

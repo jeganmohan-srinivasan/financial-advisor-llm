@@ -66,9 +66,72 @@ section[data-testid="stAppViewContainer"],
 section[data-testid="stMain"] > div,
 div[data-testid="stMainBlockContainer"] {
     background-color: var(--nw-canvas) !important;
+    color-scheme: light dark !important;
 }
 header[data-testid="stHeader"] {
     background-color: var(--nw-canvas) !important;
+}
+
+/* Ensure main-content text stays readable in both light and dark browser themes. */
+section[data-testid="stMain"] {
+    color: var(--nw-ink) !important;
+}
+section[data-testid="stMain"] p,
+section[data-testid="stMain"] li,
+section[data-testid="stMain"] h1,
+section[data-testid="stMain"] h2,
+section[data-testid="stMain"] h3,
+section[data-testid="stMain"] h4,
+section[data-testid="stMain"] h5,
+section[data-testid="stMain"] h6,
+section[data-testid="stMain"] label,
+section[data-testid="stMain"] span,
+section[data-testid="stMain"] .stMarkdown,
+section[data-testid="stMain"] .stMarkdown p,
+section[data-testid="stMain"] .stMarkdown li,
+section[data-testid="stMain"] .stAlert p,
+section[data-testid="stMain"] .stAlert li,
+section[data-testid="stMain"] .stAlert code,
+section[data-testid="stMain"] .stMarkdown code,
+section[data-testid="stMain"] .stCodeBlock {
+    color: var(--nw-ink) !important;
+}
+section[data-testid="stMain"] .stCodeBlock {
+    background-color: #F8FAFF !important;
+    border: 1px solid var(--nw-card-border) !important;
+    border-radius: 8px !important;
+    padding: 10px 12px !important;
+}
+section[data-testid="stMain"] [data-testid="stChatMessageContent"],
+section[data-testid="stMain"] [data-testid="stChatMessageContent"] p,
+section[data-testid="stMain"] [data-testid="stChatMessageContent"] li,
+section[data-testid="stMain"] [data-testid="stChatMessageContent"] code {
+    color: var(--nw-ink) !important;
+}
+section[data-testid="stMain"] [data-testid="stChatMessageContent"] {
+    background: #FFFFFF !important;
+    border: 1px solid var(--nw-card-border) !important;
+    border-radius: 10px !important;
+    padding: 10px 12px !important;
+}
+section[data-testid="stMain"] [data-testid="stChatMessageContent"] .stAlert {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+section[data-testid="stMain"] div[data-testid="stTextInput"] input,
+section[data-testid="stMain"] div[data-testid="stTextArea"] textarea,
+section[data-testid="stMain"] div[data-testid="stNumberInput"] input,
+section[data-testid="stMain"] div[data-testid="stSelectbox"] div[role="button"],
+section[data-testid="stMain"] div[data-baseweb="select"] > div {
+    color: var(--nw-ink) !important;
+    background-color: var(--nw-card) !important;
+    -webkit-text-fill-color: var(--nw-ink) !important;
+    border-color: var(--nw-card-border) !important;
+}
+section[data-testid="stMain"] div[data-testid="stTextInput"] input::placeholder,
+section[data-testid="stMain"] div[data-testid="stTextArea"] textarea::placeholder {
+    color: var(--nw-muted) !important;
 }
 
 /* Elevate common containers into white cards so they read against the blue canvas.
@@ -88,7 +151,8 @@ section[data-testid="stMain"] div[data-baseweb="select"] > div {
 }
 section[data-testid="stMain"] div[data-testid="stForm"],
 section[data-testid="stMain"] div[data-testid="stExpander"],
-section[data-testid="stMain"] div[data-testid="stMetric"] {
+section[data-testid="stMain"] div[data-testid="stMetric"],
+section[data-testid="stMain"] [data-testid="stChatMessageContent"] {
     border: 1px solid var(--nw-card-border) !important;
     padding: 6px 12px !important;
     box-shadow: 0 1px 2px rgba(15,26,44,0.04);
@@ -329,9 +393,9 @@ button[kind="primary"]:hover {
 
 /* Chat quick-start pills on FinAdvisor / Home */
 .nw-quickstart-row div[data-testid="stButton"] > button {
-    background: #ffffff !important;
+    background: var(--nw-card) !important;
     color: var(--nw-ink) !important;
-    border: 1px solid #D4DEEF !important;
+    border: 1px solid var(--nw-card-border) !important;
     border-radius: 12px !important;
     padding: 14px 16px !important;
     text-align: center !important;
@@ -341,6 +405,7 @@ button[kind="primary"]:hover {
 .nw-quickstart-row div[data-testid="stButton"] > button:hover {
     border-color: var(--nw-blue) !important;
     color: var(--nw-blue) !important;
+    background: #F7F9FF !important;
 }
 
 /* Persona / AI assistant intro card — blue theme */
@@ -351,6 +416,7 @@ button[kind="primary"]:hover {
     padding: 14px 16px;
     display: flex; align-items: flex-start; gap: 12px;
     margin: 12px 0 8px 0;
+    color: var(--nw-ink);
 }
 .nw-persona .avatar {
     width: 36px; height: 36px; border-radius: 50%;
@@ -575,7 +641,7 @@ def _sidebar_nav(page_key: str | None) -> None:
         wrapper_cls = "nw-nav-active" if is_active else "nw-nav-idle"
         bullet = "●" if is_active else "○"
         st.markdown(f'<div class="{wrapper_cls}">', unsafe_allow_html=True)
-        if st.button(f"{bullet}  {label}", key=f"nav_{label}", use_container_width=True):
+        if st.button(f"{bullet}  {label}", key=f"nav_{label}", width="stretch"):
             if not is_active:
                 st.switch_page(target)
         st.markdown("</div>", unsafe_allow_html=True)

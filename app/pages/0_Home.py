@@ -24,13 +24,13 @@ customer = apply_theme(page_key="Home")
 st.markdown(f'<div class="nw-hero-title">Welcome to {BRAND_NAME}</div>',
                 unsafe_allow_html=True)
 st.markdown(
-    '<div class="nw-hero-sub">Plan, review, and approve investment decisions '
-    'right in the chat panel.</div>',
+    '<div class="nw-hero-sub">Start with a question, pick a customer, or '
+    'begin onboarding in chat — the advisor will guide the rest.</div>',
     unsafe_allow_html=True,
 )
 
 # ------------------------- Select a customer -------------------------
-st.markdown("### Select a customer")
+st.markdown("### Open chat for an existing customer")
 customers = list_customers()
 
 if not customers:
@@ -67,14 +67,16 @@ else:
 
     left, _ = st.columns([1, 3])
     with left:
-        if st.button("Load Customer", type="primary", use_container_width=True):
+        if st.button("Open chat with this customer", type="primary", width="stretch"):
             set_active_customer(chosen)
+            st.session_state.pop(KEY_PENDING_QUESTION, None)
             st.switch_page("pages/1_FinAdvisor.py")
 
 st.divider()
 
 # ------------------------- Start a new customer -------------------------
-st.markdown("### Or start a new customer")
+st.markdown("### Or start onboarding in chat")
+st.caption("Create the profile and let the advisor ask the follow-up questions in chat.")
 with st.form("new_customer_form", clear_on_submit=False):
     c1, c2, c3 = st.columns([2, 1, 1])
     with c1:
@@ -85,7 +87,7 @@ with st.form("new_customer_form", clear_on_submit=False):
         income = st.number_input("Annual income (USD)", min_value=0.0,
                                     value=80_000.0, step=1_000.0)
     submitted = st.form_submit_button(
-        "Start New Customer Onboarding", type="primary", use_container_width=True,
+        "Create customer and start chat", type="primary", width="stretch",
     )
 
 if submitted:
@@ -106,9 +108,12 @@ if submitted:
         )
         new_id = upsert_customer(new_customer)
         set_active_customer(new_id)
-        st.session_state.pop(KEY_PENDING_QUESTION, None)
-        st.success(f"Welcome, {name}. Let's set your risk profile.")
-        st.switch_page("pages/3_Risk_Profile.py")
+        st.session_state[KEY_PENDING_QUESTION] = (
+            "I’m new here — help me onboard. Ask me a few questions to understand "
+            "my goals, timeline, and risk tolerance."
+        )
+        st.success(f"Welcome, {name}. The advisor will guide onboarding in chat.")
+        st.switch_page("pages/1_FinAdvisor.py")
 
 st.divider()
 
@@ -116,15 +121,15 @@ st.divider()
 st.markdown("### Try a quick-start prompt")
 st.markdown('<div class="nw-quickstart-row">', unsafe_allow_html=True)
 QUICK_STARTS = [
-    ("Retirement Planning",  "Am I on track for retirement at 65?"),
-    ("Child Education",      "Save for my daughter's college in 12 years"),
-    ("Buy a Home",           "Down payment for a home in 2029"),
-    ("Financial Q&A",        "What is a mutual fund vs an ETF?"),
+    ("Onboarding",     "Help me onboard and understand my financial goals"),
+    ("Retirement",     "Am I on track for retirement at 65?"),
+    ("Portfolio",      "Review my current portfolio and suggest next steps"),
+    ("Financial Q&A",  "What is a mutual fund vs an ETF?"),
 ]
 cols = st.columns(4)
 for col, (label, prompt) in zip(cols, QUICK_STARTS):
     with col:
-        if st.button(label, key=f"qs_{label}", use_container_width=True):
+        if st.button(label, key=f"qs_{label}", width="stretch"):
             st.session_state[KEY_PENDING_QUESTION] = prompt
             st.switch_page("pages/1_FinAdvisor.py")
 st.markdown("</div>", unsafe_allow_html=True)

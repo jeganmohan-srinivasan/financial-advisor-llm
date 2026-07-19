@@ -71,7 +71,7 @@ st.download_button(
     data=result.report_markdown,
     file_name=f"nexwealth_{customer.external_id}_{journey.replace(' ', '_')}.md",
     mime="text/markdown",
-    use_container_width=True,
+    width="stretch",
 )
 
 _goal = result.goal

@@ -145,7 +145,7 @@ def _render_panel_body(page_key: str, page_context: dict[str, Any] | None,
             c1, c2 = st.columns(2)
             with c1:
                 if st.button("Apply", type="primary",
-                                use_container_width=True, key="fc_apply"):
+                                width="stretch", key="fc_apply"):
                     target = _commit_change(customer, pending_change)
                     history.append({
                         "role": "assistant",
@@ -156,7 +156,7 @@ def _render_panel_body(page_key: str, page_context: dict[str, Any] | None,
                     st.session_state.pop(KEY_CHAT_PENDING_CHANGE, None)
                     st.switch_page(target)
             with c2:
-                if st.button("Discard", use_container_width=True,
+                if st.button("Discard", width="stretch",
                                 key="fc_discard"):
                     history.append({
                         "role": "assistant",
@@ -231,13 +231,13 @@ def _render_panel_body(page_key: str, page_context: dict[str, Any] | None,
     # ---- Footer actions ----
     left, right = st.columns([1, 1])
     with left:
-        if st.button("Clear chat", use_container_width=True, key="fc_clear"):
+        if st.button("Clear chat", width="stretch", key="fc_clear"):
             st.session_state[KEY_CHAT_HISTORY] = []
             st.session_state.pop(KEY_CHAT_PENDING_CHANGE, None)
             st.rerun()
     with right:
         if st.button("Open full FinAdvisor", type="primary",
-                        use_container_width=True, key="fc_open_full"):
+                        width="stretch", key="fc_open_full"):
             st.switch_page("pages/1_FinAdvisor.py")
 
 

@@ -12,7 +12,7 @@ sys.path.insert(0, str(_ROOT))
 
 import streamlit as st  # noqa: E402
 
-from advisor.agents.advisor import answer_question  # noqa: E402
+from advisor.agents.advisor import AdvisorAnswer, answer_question  # noqa: E402
 from advisor.agents.intent import (  # noqa: E402
     OUT_OF_SCOPE, OUT_OF_SCOPE_MESSAGE, classify_intent,
 )
@@ -31,8 +31,8 @@ customer = apply_theme(page_key="FinAdvisor")
 st.markdown('<div class="nw-hero-title">FinAdvisor by NexWealth AI</div>',
                 unsafe_allow_html=True)
 st.markdown(
-    '<div class="nw-hero-sub">Ask a financial question or pick a planning journey. '
-    f'&nbsp;·&nbsp; {provider_label()}.</div>',
+    '<div class="nw-hero-sub">Ask a question, start onboarding in chat, or '
+    'pick a planning journey. 'f'&nbsp;·&nbsp; {provider_label()}.</div>',
     unsafe_allow_html=True,
 )
 
@@ -49,7 +49,7 @@ st.markdown(
       <div>
         <div class="who">FinAdvisor</div>
         <div class="msg">Hi — I can help with retirement, education, home-buying,
-        or general financial questions. {persona_line}</div>
+        or general financial questions, and I can guide onboarding in chat. {persona_line}</div>
       </div>
     </div>
     """,
@@ -67,11 +67,42 @@ QUICK_STARTS = [
 cols = st.columns(4)
 for col, (label, prompt) in zip(cols, QUICK_STARTS):
     with col:
-        if st.button(label, key=f"pill_{label}", use_container_width=True):
+        if st.button(label, key=f"pill_{label}", width="stretch"):
             st.session_state[KEY_PENDING_QUESTION] = prompt
 st.markdown("</div>", unsafe_allow_html=True)
 
 # ------------------------- Handler -------------------------
+def _is_onboarding_prompt(question: str) -> bool:
+    q = question.lower()
+    markers = (
+        "onboard",
+        "new here",
+        "financial goals",
+        "my goals",
+        "risk tolerance",
+        "timeline",
+        "help me get started",
+    )
+    return any(marker in q for marker in markers)
+
+
+def _build_onboarding_response(question: str, customer_name: str | None) -> AdvisorAnswer:
+    intro = (
+        f"Absolutely — I can guide this in chat. "
+        f"{'I’ll keep it lightweight and conversational.' if customer_name else 'Let’s start with a few quick details.'}"
+    )
+    body = (
+        "To get started, tell me: 1) what you want to achieve, "
+        "2) your timeline, and 3) how much risk you’re comfortable with. "
+        "If you prefer, I can also help you review your current portfolio next."
+    )
+    return AdvisorAnswer(
+        question=question,
+        answer_markdown=f"{intro}\n\n{body}",
+        follow_up="If you’d like, I can turn this into a full plan after we chat through the basics.",
+    )
+
+
 def _handle(question: str) -> None:
     st.session_state[KEY_LAST_QUESTION] = question
     intent = classify_intent(question)
@@ -81,6 +112,13 @@ def _handle(question: str) -> None:
         f"**Intent:** `{intent.journey}` "
         f"*(source: {intent.source}, confidence {intent.confidence:.2f})*"
     )
+
+    if _is_onboarding_prompt(question):
+        st.session_state[KEY_LAST_ADVISOR_TURN] = _build_onboarding_response(
+            question,
+            customer.name if customer else None,
+        )
+        return
 
     if intent.journey == OUT_OF_SCOPE:
         # Refuse cleanly instead of spending a ReAct loop on a non-finance question.
@@ -120,7 +158,7 @@ with st.form("finadvisor_form", clear_on_submit=False):
         value=default_q, height=100,
         placeholder="e.g. Am I on track for retirement?",
     )
-    submitted = st.form_submit_button("Send", use_container_width=True, type="primary")
+    submitted = st.form_submit_button("Send", width="stretch", type="primary")
 
 if submitted and question.strip():
     _handle(question.strip())

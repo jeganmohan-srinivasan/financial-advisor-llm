@@ -107,7 +107,7 @@ for col, opt in zip(cols, rec.options):
         st.markdown("**Target allocation**")
         st.dataframe(
             [{"Asset class": ac, "%": v} for ac, v in opt.target_allocation_pct.items()],
-            use_container_width=True, hide_index=True,
+            width="stretch", hide_index=True,
         )
         if opt.rebalancing_actions:
             st.markdown("**Rebalancing actions**")
@@ -133,7 +133,7 @@ rationale = st.text_area("Rationale (optional)", height=80,
 if mode.startswith("Override with a different"):
     chosen_model = st.selectbox("Pick model", [o.model for o in rec.options],
                                   index=[o.model for o in rec.options].index(rec.ai_suggested))
-    if st.button("Commit override", type="primary", use_container_width=True):
+    if st.button("Commit override", type="primary", width="stretch"):
         apply_model_override(rec, chosen_model, rationale)
         commit_hitl_decision(result.hitl_id, final_choice=chosen_model,
                                 final_action="override", rationale=rationale)
@@ -157,7 +157,7 @@ elif mode.startswith("Override with a custom"):
     total = sum(custom_pct.values())
     st.caption(f"Total: **{total:.1f}%**")
     if st.button("Commit custom allocation", type="primary",
-                  disabled=abs(total - 100) > 0.5, use_container_width=True):
+                  disabled=abs(total - 100) > 0.5, width="stretch"):
         apply_custom_allocation_override(rec, custom_pct, rationale)
         commit_hitl_decision(result.hitl_id, final_choice="custom",
                                 final_action="override", rationale=rationale,
@@ -166,7 +166,7 @@ elif mode.startswith("Override with a custom"):
         st.switch_page("pages/5_Report.py")
 
 elif mode.startswith("Reject"):
-    if st.button("Commit rejection", type="secondary", use_container_width=True):
+    if st.button("Commit rejection", type="secondary", width="stretch"):
         commit_hitl_decision(result.hitl_id, final_choice=rec.ai_suggested,
                                 final_action="reject", rationale=rationale)
         st.success("Recorded rejection")
